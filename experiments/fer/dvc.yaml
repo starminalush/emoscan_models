@@ -1,0 +1,8 @@
+stages:
+  download_dataset_from_kaggle:
+    wdir: ../../
+    cmd: python3 experiments/fer/data/download_dataset.py data/external/fer2013
+    deps:
+      - experiments/fer/data/download_dataset.py
+    outs:
+      - data/external/fer2013
