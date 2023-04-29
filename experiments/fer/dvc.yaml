@@ -6,3 +6,29 @@ stages:
       - experiments/fer/data/download_dataset.py
     outs:
       - data/external/fer2013
+
+  train_val_split:
+    wdir: ../../
+    cmd: python3 experiments/fer/data/make_learning_subsets.py data/external/fer2013 data/processed/fer2013
+    deps:
+      - experiments/fer/data/make_learning_subsets.py
+      - data/external/fer2013
+    outs:
+      - data/processed/fer2013
+
+  train_model:
+    wdir: ../../
+    cmd: python3 experiments/fer/train.py experiments/fer/configs/train.yaml models/resnet_baseline.pt
+    deps:
+      - experiments/fer/train.py
+      - experiments/fer/configs/train.yaml
+    outs:
+      - models/resnet_baseline.pt
+
+  test_model:
+    wdir: ../../
+    cmd: python3 experiments/fer/test.py experiments/fer/configs/train.yaml models/resnet_baseline.pt
+    deps:
+      - experiments/fer/test.py
+      - experiments/fer/configs/train.yaml
+      - models/resnet_baseline.pt

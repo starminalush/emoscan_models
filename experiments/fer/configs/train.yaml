@@ -1,0 +1,16 @@
+datasets:
+  train_dir: data/external/fer2013/train
+  val_dir: data/external/fer2013/test
+
+  batch_size: 16
+
+optimizer:
+  lr: 0.01
+  momentum: 0.1
+
+
+scheduler:
+  step_size: 7
+  gamma: 0.1
+
+num_epochs: 5

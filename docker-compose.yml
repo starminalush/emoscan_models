@@ -30,3 +30,39 @@ services:
       /usr/bin/mc policy set public myminio/${MINIO_BUCKET};
       exit 0;
       "
+      
+
+  postgres:
+    container_name: postgres
+    image: postgres
+    restart: always
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      PGDATA: /data/postgres
+
+    volumes:
+      - ./infrastracture_data/postgres:/data/postgres
+    ports:
+      - "${POSTGRES_EXTERNAL_PORT}:5432"
+
+
+    mlflow:
+      restart: always
+      build: ./docker/mlflow/
+      container_name: mlflow_server
+      env_file:
+        - .env
+      depends_on:
+        - postgres
+        - minio
+      environment:
+        AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+        AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+        MLFLOW_S3_ENDPOINT_URL: ${MLFLOW_S3_ENDPOINT_URL}
+      ports:
+        - "${MLFLOW_EXTERNAL_PORT}:5000"
+      command: mlflow server --backend-store-uri postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB} --default-artifact-root s3://${MINIO_MLFLOW_BUCKET}/ --host 0.0.0.0

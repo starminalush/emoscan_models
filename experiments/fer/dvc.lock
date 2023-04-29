@@ -1,13 +1,29 @@
 schema: '2.0'
 stages:
   download_dataset_from_kaggle:
-    cmd: python3 src/fer/data/download_dataset.py data/external/fer2013
+    cmd: python3 experiments/fer/data/download_dataset.py data/external/fer2013
     deps:
-    - path: src/fer/data/download_dataset.py
-      md5: 6bcca5eb57994094129ddedeaf6fd5a1
-      size: 723
+    - path: experiments/fer/data/download_dataset.py
+      md5: bbdbeca7b13d351818ce8c803576fef5
+      size: 657
     outs:
     - path: data/external/fer2013
       md5: 3a60a2cf7073f0e142e1fc108e6f7949.dir
       size: 56510189
       nfiles: 35887
+  train_val_split:
+    cmd: python3 experiments/fer/data/make_learning_subsets.py data/external/fer2013
+      data/processed/fer2013
+    deps:
+    - path: data/external/fer2013
+      md5: 3a60a2cf7073f0e142e1fc108e6f7949.dir
+      size: 56510189
+      nfiles: 35887
+    - path: experiments/fer/data/make_learning_subsets.py
+      md5: c3678e39ad993e956e12196940abb6a8
+      size: 1006
+    outs:
+    - path: data/processed/fer2013
+      md5: 9ba59d357798902c441d3b2353ce1cec.dir
+      size: 45185869
+      nfiles: 28709
