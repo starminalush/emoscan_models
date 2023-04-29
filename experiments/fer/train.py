@@ -138,6 +138,7 @@ def train(config_path: str | Path, model_name: str | Path):
 
     scheduler = StepLR(optimizer, **config["scheduler"])
     f1_metric = F1Score(task="multiclass", num_classes=len(train_data.classes))
+    f1_metric.to(os.getenv('DEVICE'))
     with mlflow.start_run(experiment_id=experiment_id):
         model, best_loss, best_f1, test_f1_history, test_loss_history = __train(
             config["num_epochs"],

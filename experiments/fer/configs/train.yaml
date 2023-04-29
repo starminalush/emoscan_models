@@ -1,8 +1,8 @@
 datasets:
-  train_dir: data/external/fer2013/train
-  val_dir: data/external/fer2013/test
+  train_dir: data/processed/fer2013/train
+  val_dir: data/processed/fer2013/val
 
-  batch_size: 16
+  batch_size: 128
 
 optimizer:
   lr: 0.01

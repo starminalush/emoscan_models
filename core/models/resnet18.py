@@ -11,7 +11,7 @@ class FERResnet18(nn.Module):
 
     @staticmethod
     def __init_model(num_classes):
-        model = models.resnet18(pretrained=False)
+        model = models.resnet18(pretrained=True)
 
         # Convert model to grayscale
         model.conv1 = torch.nn.Conv2d(

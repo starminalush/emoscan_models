@@ -4,7 +4,7 @@ stages:
     cmd: python3 experiments/fer/data/download_dataset.py data/external/fer2013
     deps:
     - path: experiments/fer/data/download_dataset.py
-      md5: bbdbeca7b13d351818ce8c803576fef5
+      md5: f24bbde905cb40ec4313cfeeb0abc5d5
       size: 657
     outs:
     - path: data/external/fer2013
