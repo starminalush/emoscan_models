@@ -1,7 +1,6 @@
 from pathlib import Path
 
 import torch
-from loguru import logger
 from PIL import Image
 from torch.utils.data import Dataset
 
@@ -12,7 +11,6 @@ class FER2013Dataset(Dataset):
         self.file_list = [f for f in self.dataset_path.rglob("*.jpg") if f.is_file()]
         self.transform = transform
         self.phase = phase
-        self.classes = sorted([f for f in self.dataset_path.iterdir() if f.is_dir()])
 
     def __len__(self):
         return len(self.file_list)
@@ -25,14 +23,15 @@ class FER2013Dataset(Dataset):
             img = self.transform(img, self.phase)
         # Get Label
         label = img_path.parent
-        label_idx = torch.tensor(self.classes.index(label)).type(torch.long)
+        label_idx = -1
+        match label:
+            case 'happy':
+                label_idx = 0
+            case 'neutral':
+                label_idx = 1
+            case _:
+                label_idx = 2
+
+        label_idx = torch.tensor(label_idx).type(torch.long)
 
         return img, label_idx
-
-    @property
-    def class_distribution(self):
-        return {
-            self.classes.index(f): len([*f.iterdir()])
-            for f in self.dataset_path.rglob("*")
-            if f.is_dir()
-        }

@@ -20,8 +20,8 @@ stages:
       size: 56510189
       nfiles: 35887
     - path: experiments/fer/data/make_learning_subsets.py
-      md5: c3678e39ad993e956e12196940abb6a8
-      size: 1006
+      md5: 68c9be459fe253ca64506ebcac936e64
+      size: 839
     outs:
     - path: data/processed/fer2013
       md5: 9ba59d357798902c441d3b2353ce1cec.dir

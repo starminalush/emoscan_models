@@ -16,6 +16,7 @@ stages:
     outs:
       - data/processed/fer2013
 
+
   train_model:
     wdir: ../../
     cmd: python3 experiments/fer/train.py experiments/fer/configs/train.yaml models/resnet_baseline.pt

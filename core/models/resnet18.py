@@ -11,15 +11,13 @@ class FERResnet18(nn.Module):
 
     @staticmethod
     def __init_model(num_classes):
-        model = models.resnet18(pretrained=True)
+        model = models.resnet18()
 
-        # Convert model to grayscale
         model.conv1 = torch.nn.Conv2d(
             1, 64, kernel_size=7, stride=2, padding=3, bias=False
         )
 
-        # Update the fully connected layer based on the number of classes in the dataset
-        model.fc = torch.nn.Linear(model.fc.in_features, num_classes)
+        model.fc = torch.nn.Linear(model.fc.in_features, num_classes, bias=True)
 
         return model
 
