@@ -6,7 +6,6 @@ from pathlib import Path
 from typing import List, OrderedDict, Tuple
 
 import click
-import mlflow
 import torch
 from dotenv import load_dotenv
 from loguru import logger
@@ -17,14 +16,16 @@ from torchmetrics import F1Score
 from tqdm import tqdm
 from utils import load_config, timeit
 
+import mlflow
 from core.data.datasets.fer2013 import FER2013Dataset
 from core.data.transforms.baseline_transforms import ImageTransform
 from core.models.resnet18 import FERResnet18
 
-load_dotenv('.env')
+load_dotenv(".env")
 
 mlflow.set_tracking_uri(os.environ["MLFLOW_TRACKING_URI"])
 print(mlflow.get_tracking_uri())
+
 
 @timeit
 def __train(
@@ -77,13 +78,10 @@ def __train(
                         optimizer.step()
 
                 current_loss += loss.item() * inputs.size(0)
-                # logger.error(preds)
-                # logger.error(labels)
-                # logger.error(f1_metric(preds, labels))
                 current_f1 += f1_metric(preds, labels)
 
-            epoch_loss: float = current_loss / i
-            epoch_f1: float = current_f1 / i
+            epoch_loss: float = current_loss / len(dataloaders[phase])
+            epoch_f1: float = current_f1 / len(dataloaders[phase])
 
             logger.info(f"phase {phase}, loss {epoch_loss}, f1 {epoch_f1}")
 
@@ -125,18 +123,25 @@ def train(config_path: str | Path, model_name: str | Path):
         "val": DataLoader(test_data, batch_size=batch_size, pin_memory=True),
     }
 
-    model = FERResnet18(
-        num_classes=3, device=torch.device(os.getenv("DEVICE"))
+    model = FERResnet18(num_classes=3, device=torch.device(os.getenv("DEVICE")))
+    max_of_counts_dataset = max(list(train_data.class_distribution.values()))
+    classes_weights = list(
+        map(
+            lambda class_count: max_of_counts_dataset / class_count,
+            list(train_data.class_distribution.values()),
+        )
     )
+    # classes_weights = [1-v/len(train_data) for  v in train_data.class_distribution.values()]
+    logger.info(classes_weights)
 
-
-
-    criterion = torch.nn.CrossEntropyLoss()
+    criterion = torch.nn.CrossEntropyLoss(
+        weight=torch.Tensor(classes_weights).to(os.getenv("DEVICE"))
+    )
     optimizer = torch.optim.SGD(model.parameters(), **config["optimizer"])
 
     scheduler = StepLR(optimizer, **config["scheduler"])
-    f1_metric = F1Score(task="multiclass", num_classes=3)
-    f1_metric.to(os.getenv('DEVICE'))
+    f1_metric = F1Score(task="multiclass", num_classes=3, average="macro")
+    f1_metric.to(os.getenv("DEVICE"))
     with mlflow.start_run(experiment_id=experiment_id):
         model, best_loss, best_f1, test_f1_history, test_loss_history = __train(
             config["num_epochs"],
@@ -148,14 +153,13 @@ def train(config_path: str | Path, model_name: str | Path):
             criterion,
             f1_metric,
         )
-        Path(model_name).mkdir(exist_ok=True, parents=True)
-        mlflow.pytorch.log_model(
-            model,
-            model_name,
-            registered_model_name=model_name,
-        )
-        mlflow.log_artifact(config_path)
-        mlflow.pytorch.save_model(model, model_name)
+        # mlflow.pytorch.log_model(
+        #     model,
+        #     model_name,
+        #     registered_model_name=model_name,
+        # )
+        # mlflow.log_artifact(config_path)
+        torch.save(model, model_name)
         mlflow.log_metric("Best F1", best_f1)
         mlflow.log_metric("Best loss", best_loss)
         for i in range(len(test_loss_history)):

@@ -28,6 +28,9 @@ services:
       /usr/bin/mc alias set myminio http://minio:9000 ${AWS_ACCESS_KEY_ID} ${AWS_SECRET_ACCESS_KEY};
       /usr/bin/mc mb myminio/${MINIO_BUCKET};
       /usr/bin/mc policy set public myminio/${MINIO_BUCKET};
+      /usr/bin/mc alias set myminio http://minio:9000 ${AWS_ACCESS_KEY_ID} ${AWS_SECRET_ACCESS_KEY};
+      /usr/bin/mc mb myminio/${MINIO_MLFLOW_BUCKET};
+      /usr/bin/mc policy set public myminio/${MINIO_MLFLOW_BUCKET};
       exit 0;
       "
       
@@ -65,4 +68,4 @@ services:
       MLFLOW_S3_ENDPOINT_URL: ${AWS_ENDPOINT_URL}
     ports:
       - "${MLFLOW_EXTERNAL_PORT}:5000"
-    command: mlflow server --backend-store-uri postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB} --default-artifact-root s3://${MINIO_MLFLOW_BUCKET}/ --host 0.0.0.0
+    command: mlflow server --backend-store-uri postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB} --default-artifact-root s3://${MINIO_MLFLOW_BUCKET}/ --serve-artifacts --host 0.0.0.0

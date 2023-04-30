@@ -27,3 +27,28 @@ stages:
       md5: 9ba59d357798902c441d3b2353ce1cec.dir
       size: 45185869
       nfiles: 28709
+  train_model:
+    cmd: python3 experiments/fer/train.py experiments/fer/configs/train.yaml models/resnet_baseline.pt
+    deps:
+    - path: experiments/fer/configs/train.yaml
+      md5: a684ba2c1ad36417b87ab803a1427a4b
+      size: 188
+    - path: experiments/fer/train.py
+      md5: c449927e459b56da53eeae7712b2c42a
+      size: 6012
+    outs:
+    - path: models/resnet_baseline.pt
+      md5: 748c4482e4c0f3aac33b46706d2ab27d
+      size: 44779565
+  test_model:
+    cmd: python3 experiments/fer/test.py experiments/fer/configs/train.yaml models/resnet_baseline.pt
+    deps:
+    - path: experiments/fer/configs/train.yaml
+      md5: a684ba2c1ad36417b87ab803a1427a4b
+      size: 188
+    - path: experiments/fer/test.py
+      md5: 3c429b08b3d175f8529591491806e445
+      size: 1923
+    - path: models/resnet_baseline.pt
+      md5: 748c4482e4c0f3aac33b46706d2ab27d
+      size: 44779565
