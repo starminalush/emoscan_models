@@ -1,0 +1,15 @@
+datasets:
+  train_dir: data/processed/fer2013/train
+  val_dir: data/processed/fer2013/val
+
+  batch_size: 128
+
+optimizer:
+  lr: 0.01
+
+
+scheduler:
+  step_size: 7
+  gamma: 0.1
+
+num_epochs: 50

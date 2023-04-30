@@ -9,7 +9,7 @@ api.authenticate()
 
 
 @click.command()
-@click.argument("external_dataset_path", type=click.Path())
+@click.argument("external-dataset-path", type=click.Path())
 def download_dataset(external_dataset_path: str):
     """Download external dataset from kaggle. Link: https://www.kaggle.com/datasets/msambare/fer2013.
     Args:
