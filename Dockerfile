@@ -11,8 +11,6 @@ RUN sudo apt-get update \
 
 COPY requirements.txt .
 RUN pip install -r requirements.txt
-RUN pip install dvc[s3]==2.20.0
-RUN pip install torchmetrics
 WORKDIR /train_models
 
 
