@@ -1,0 +1,41 @@
+dataset:
+  class_str: torchvision.datasets.ImageFolder
+
+transforms:
+  class_str: core.data.transforms.baseline_transforms.ImageTransform
+  params:
+    img_size: 224
+
+dataset_path:
+  train_dir: data/processed/fer2013/train
+  val_dir: data/processed/fer2013/val
+
+metrics:
+  class_str: torchmetrics.classification.MulticlassF1Score
+  params:
+    num_classes: 7
+
+model:
+  class_str: core.models.resnet18.FERResnet18
+  params:
+    num_class: 7
+    pretrained: True
+
+criterion_cls:
+  class_str: torch.nn.CrossEntropyLoss
+
+optimizer:
+  class_str: torch.optim.Adam
+  params:
+    lr: 0.001
+
+scheduler:
+  class_str: torch.optim.lr_scheduler.ExponentialLR
+  params:
+    gamma: 0.6
+
+trainer:
+  class_str: core.trainers.Trainer
+
+batch_size: 64
+num_epochs: 2

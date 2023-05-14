@@ -1,0 +1,41 @@
+schema: '2.0'
+stages:
+  train_model:
+    cmd: python3 experiments/train.py experiments/configs/fer/train.yaml models/resnet_baseline.pt
+    deps:
+    - path: experiments/configs/fer/train.yaml
+      md5: 2d0598374a4802407c068fdf9cf90f39
+      size: 744
+    - path: experiments/train.py
+      md5: 04cc55868fd3b2f66451a2af01224142
+      size: 3858
+    outs:
+    - path: models/resnet_baseline.pt
+      md5: 0f918f8c3c753f497ca83dbbb8129dae
+      size: 44812845
+  download_dataset_from_kaggle:
+    cmd: python3 experiments/data/download_dataset.py data/external/fer2013
+    deps:
+    - path: experiments/data/download_dataset.py
+      md5: f24bbde905cb40ec4313cfeeb0abc5d5
+      size: 657
+    outs:
+    - path: data/external/fer2013
+      md5: 3a60a2cf7073f0e142e1fc108e6f7949.dir
+      size: 56510189
+      nfiles: 35887
+  train_val_split:
+    cmd: python3 experiments/data/make_learning_subsets.py data/external/fer2013 data/processed/fer2013
+    deps:
+    - path: data/external/fer2013
+      md5: 3a60a2cf7073f0e142e1fc108e6f7949.dir
+      size: 56510189
+      nfiles: 35887
+    - path: experiments/data/make_learning_subsets.py
+      md5: 68c9be459fe253ca64506ebcac936e64
+      size: 839
+    outs:
+    - path: data/processed/fer2013
+      md5: 9ba59d357798902c441d3b2353ce1cec.dir
+      size: 45185869
+      nfiles: 28709
