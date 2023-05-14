@@ -79,7 +79,7 @@ def train(config_path: str | Path, model_output_path: str | Path):
         criterion=criterion_cls,
         model=model,
         metrics=metric,
-        per_class_metrics=per_class_metric
+        per_class_metrics=per_class_metric,
     )
 
     # train and valid
