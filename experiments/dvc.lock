@@ -4,14 +4,14 @@ stages:
     cmd: python3 experiments/train.py experiments/configs/fer/train.yaml models/resnet_baseline.pt
     deps:
     - path: experiments/configs/fer/train.yaml
-      md5: 2d0598374a4802407c068fdf9cf90f39
+      md5: 63e96d1a8b85fc96f71f711acced6cce
       size: 744
     - path: experiments/train.py
-      md5: 04cc55868fd3b2f66451a2af01224142
-      size: 3858
+      md5: e93f1e240575c2ddf320fd8ca4b09cfc
+      size: 3587
     outs:
     - path: models/resnet_baseline.pt
-      md5: 0f918f8c3c753f497ca83dbbb8129dae
+      md5: 70f33f1d7dc0130d51086d2de954dd27
       size: 44812845
   download_dataset_from_kaggle:
     cmd: python3 experiments/data/download_dataset.py data/external/fer2013

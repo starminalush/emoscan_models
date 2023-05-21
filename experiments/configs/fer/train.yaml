@@ -37,5 +37,5 @@ scheduler:
 trainer:
   class_str: core.trainers.Trainer
 
-batch_size: 64
-num_epochs: 2
+batch_size: 128
+num_epochs: 25
