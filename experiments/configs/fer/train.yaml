@@ -39,4 +39,4 @@ trainer:
   class_str: core.trainers.Trainer
 
 batch_size: 128
-num_epochs: 1
+num_epochs: 25
