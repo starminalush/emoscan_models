@@ -9,7 +9,7 @@ transforms:
 dataset_path:
   train_dir: data/processed/fer2013/train
   val_dir: data/processed/fer2013/val
-  test_dir: data/processed/fer2013/test
+  test_dir: data/external/fer2013/test
 
 metrics:
   class_str: torchmetrics.classification.MulticlassF1Score
