@@ -9,6 +9,7 @@ transforms:
 dataset_path:
   train_dir: data/processed/affectnet/train
   val_dir: data/processed/affectnet/val
+  test_dir: data/processed/affectnet/test
 
 metrics:
   class_str: torchmetrics.classification.MulticlassF1Score
@@ -38,4 +39,4 @@ trainer:
   class_str: core.trainers.Trainer
 
 batch_size: 128
-num_epochs: 25
+num_epochs: 1
