@@ -7,19 +7,19 @@ transforms:
     img_size: 224
 
 dataset_path:
-  train_dir: data/processed/fer2013/train
-  val_dir: data/processed/fer2013/val
-  test_dir: data/external/fer2013/test
+  train_dir: data/processed/affectnet/train
+  val_dir: data/processed/affectnet/val
+  test_dir: data/processed/affectnet/test
 
 metrics:
   class_str: torchmetrics.classification.MulticlassF1Score
   params:
-    num_classes: 7
+    num_classes: 8
 
 model:
   class_str: core.models.resnet18.FERResnet18
   params:
-    num_class: 7
+    num_class: 8
     pretrained: True
 
 criterion_cls:

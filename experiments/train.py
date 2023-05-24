@@ -64,7 +64,6 @@ def train(config_path: str | Path, model_output_path: str | Path):
     )
     per_class_metric.to(device)
 
-    # params = list(model.parameters()) + list(criterion_af.parameters())
     optimizer = init_module(config["optimizer"]["class_str"])(
         model.parameters(), **config["optimizer"]["params"]
     )

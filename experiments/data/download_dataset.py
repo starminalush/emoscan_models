@@ -10,13 +10,14 @@ api.authenticate()
 
 @click.command()
 @click.argument("external-dataset-path", type=click.Path())
-def download_dataset(external_dataset_path: str):
-    """Download external dataset from kaggle. Link: https://www.kaggle.com/datasets/msambare/fer2013.
+@click.argument("dataset-name", type=str)
+def download_dataset(external_dataset_path: str, dataset_name: str):
+    """Download external dataset from kaggle by dataset name
     Args:
+        dataset_name: kaggle dataset name
         external_dataset_path: download dataset path
     """
-    ds_name: str = "msambare/fer2013"
-    api.dataset_download_files(ds_name, path=external_dataset_path, unzip=True)
+    api.dataset_download_files(dataset_name, path=external_dataset_path, unzip=True)
     logger.info("finish download dataset")
 
 
