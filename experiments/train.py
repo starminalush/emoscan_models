@@ -33,7 +33,7 @@ def train(config_path: str | Path, model_output_path: str | Path):
     )
     # все равно у val и test выборки одинаковые аугментации
     test_data = init_module(config["dataset"]["class_str"])(
-        config["dataset_path"]["val_dir"], transform=transforms(phase="val")
+        config["dataset_path"]["test_dir"], transform=transforms(phase="val")
     )
     batch_size = int(config["batch_size"])
     num_epochs = config["num_epochs"]
