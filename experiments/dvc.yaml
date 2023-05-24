@@ -1,20 +1,20 @@
 stages:
   download_dataset_from_kaggle:
     wdir: ../
-    cmd: python3 experiments/data/download_dataset.py data/external/fer2013
+    cmd: python3 experiments/data/download_dataset.py data/external/affectnet noamsegal/affectnet-training-data
     deps:
       - experiments/data/download_dataset.py
     outs:
-      - data/external/fer2013
+      - data/external/affectnet
 
   train_val_split:
     wdir: ../
-    cmd: python3 experiments/data/make_learning_subsets.py data/external/fer2013 data/processed/fer2013
+    cmd: python3 experiments/data/make_learning_subsets.py data/external/affectnet data/processed/affectnet
     deps:
       - experiments/data/make_learning_subsets.py
-      - data/external/fer2013
+      - data/external/affectnet
     outs:
-      - data/processed/fer2013
+      - data/processed/affectnet
 
 
   train_model:
