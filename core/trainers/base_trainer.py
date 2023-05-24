@@ -78,6 +78,24 @@ class Trainer:
 
         return epoch_metrics, epoch_loss
 
+    def calculate_throughtput(self):
+        dummy_input = torch.randn(1, 3, 224, 224, dtype=torch.float).to(self.device)
+        repetitions = 100
+        total_time = 0
+        with torch.no_grad():
+            for rep in range(repetitions):
+                starter, ender = torch.cuda.Event(enable_timing=True), torch.cuda.Event(
+                    enable_timing=True
+                )
+                starter.record()
+                _ = self.model(dummy_input)
+                ender.record()
+                torch.cuda.synchronize()
+                curr_time = starter.elapsed_time(ender) / 1000
+                total_time += curr_time
+        throughput = repetitions / total_time
+        return throughput
+
     def test(self) -> Tuple[float, float]:
         with torch.no_grad():
             for data in self.dataloaders["test"]:
