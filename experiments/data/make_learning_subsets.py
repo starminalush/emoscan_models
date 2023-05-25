@@ -1,7 +1,9 @@
 from pathlib import Path
+from shutil import rmtree
 
 import click
 import splitfolders
+
 
 
 @click.command()
@@ -19,6 +21,7 @@ def make_learning_subsets(dataset_dir: Path | str, output_dataset_dir: Path | st
         (output_dataset_dir / subset / "anger").rename(
             output_dataset_dir / subset / "angry"
         )
+        rmtree((output_dataset_dir / subset / "contempt"))
 
 
 if __name__ == "__main__":

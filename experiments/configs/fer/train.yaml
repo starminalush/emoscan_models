@@ -14,12 +14,12 @@ dataset_path:
 metrics:
   class_str: torchmetrics.classification.MulticlassF1Score
   params:
-    num_classes: 8
+    num_classes: 7
 
 model:
   class_str: core.models.resnet18.FERResnet18
   params:
-    num_class: 8
+    num_class: 7
     pretrained: True
 
 criterion_cls:

@@ -16,7 +16,6 @@ stages:
     outs:
       - data/processed/affectnet
 
-
   train_model:
     wdir: ../
     cmd: python3 experiments/train.py experiments/configs/fer/train.yaml models/resnet_baseline.pt
