@@ -20,7 +20,7 @@ load_dotenv()
 @click.argument("config-path", type=click.Path(exists=True))
 @click.argument("model-output-path", type=click.Path())
 @click.argument("checkpoint-path", type=click.Path())
-# @mlflow_logger("fer")
+@mlflow_logger("fer")
 def train(
     config_path: str | Path, model_output_path: str | Path, checkpoint_path: str | Path
 ):
