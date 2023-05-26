@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from torch import nn
 from torch.utils.data import DataLoader
 from torchsampler import ImbalancedDatasetSampler
-from utils import init_module, load_config, mlflow_logger
+from utils import init_module, load_config, mlflow_logger, download_pretrained_model_from_gdrive
 
 from core.trainers import Trainer
 
@@ -18,8 +18,9 @@ load_dotenv()
 @click.command()
 @click.argument("config-path", type=click.Path(exists=True))
 @click.argument("model-output-path", type=click.Path())
-@mlflow_logger("fer")
-def train(config_path: str | Path, model_output_path: str | Path):
+@click.argument("checkpoint-path", type=click.Path())
+# @mlflow_logger("fer")
+def train(config_path: str | Path, model_output_path: str | Path, checkpoint_path: str | Path):
     config: Dict[str, str | float | int] = load_config(config_path=config_path)
 
     transforms = init_module(config["transforms"]["class_str"])(
@@ -50,12 +51,22 @@ def train(config_path: str | Path, model_output_path: str | Path):
     }
 
     device = torch.device(os.getenv("DEVICE"))
+
     model: nn.Module = init_module(config["model"]["class_str"])(
         **config["model"]["params"]
     )
+    if checkpoint_path:
+        if not Path(checkpoint_path).exists():
+            download_pretrained_model_from_gdrive(config["model"]["checkpoint_gdrive_id"], checkpoint_path)
+        checkpoint = torch.load(
+           checkpoint_path, map_location=device,
+        )
+        model.load_state_dict(checkpoint["model_state_dict"], strict=True)
     model.to(device)
 
     criterion_cls = init_module(config["criterion_cls"]["class_str"])()
+    criterion_af = init_module(config["criterion_af"]["class_str"])(**config["criterion_af"]["params"], device=device)
+    criterion_pt = init_module(config["criterion_pt"]["class_str"])()
     metric = init_module(config["metrics"]["class_str"])(**config["metrics"]["params"])
     metric.to(device)
 
@@ -63,9 +74,9 @@ def train(config_path: str | Path, model_output_path: str | Path):
         **config["metrics"]["params"], average=None
     )
     per_class_metric.to(device)
-
+    params = list(model.parameters()) + list(criterion_af.parameters())
     optimizer = init_module(config["optimizer"]["class_str"])(
-        model.parameters(), **config["optimizer"]["params"]
+        params, **config["optimizer"]["params"]
     )
     scheduler = init_module(config["scheduler"]["class_str"])(
         optimizer, **config["scheduler"]["params"]
@@ -79,6 +90,8 @@ def train(config_path: str | Path, model_output_path: str | Path):
         model=model,
         metrics=metric,
         per_class_metrics=per_class_metric,
+        criterion_pt = criterion_pt,
+        criterion_af=criterion_af
     )
 
     # train and valid

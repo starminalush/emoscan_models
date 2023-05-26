@@ -4,9 +4,14 @@ from time import time
 
 import yaml
 from loguru import logger
+import gdown
 
 import mlflow
 
+
+def download_pretrained_model_from_gdrive(file_id:str, output_model_name: str):
+    uri = f"https://drive.google.com/uc?id={file_id}"
+    gdown.download(uri, output_model_name, quiet=False)
 
 def load_config(config_path: str):
     with open(config_path) as src:

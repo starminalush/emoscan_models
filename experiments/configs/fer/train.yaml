@@ -17,13 +17,22 @@ metrics:
     num_classes: 7
 
 model:
-  class_str: core.models.resnet18.FERResnet18
+  class_str: submodules.DAN.src.networks.dan.DAN
   params:
     num_class: 7
-    pretrained: True
+    pretrained: False
+  checkpoint_gdrive_id: 1ASabP5wkLUIh4VQc8CEuZbZyLJEFaTMF
 
 criterion_cls:
   class_str: torch.nn.CrossEntropyLoss
+
+criterion_af:
+  class_str: submodules.DAN.src.affectnet.AffinityLoss
+  params:
+    num_class: 7
+
+criterion_pt:
+  class_str: submodules.DAN.src.affectnet.PartitionLoss
 
 optimizer:
   class_str: torch.optim.Adam
@@ -36,7 +45,7 @@ scheduler:
     gamma: 0.6
 
 trainer:
-  class_str: core.trainers.Trainer
+  class_str: core.trainers.DANTrainer
 
 batch_size: 128
-num_epochs: 25
+num_epochs: 1
