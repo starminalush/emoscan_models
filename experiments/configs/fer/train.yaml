@@ -48,4 +48,4 @@ trainer:
   class_str: core.trainers.DANTrainer
 
 batch_size: 128
-num_epochs: 1
+num_epochs: 10

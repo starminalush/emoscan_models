@@ -5,7 +5,6 @@ import click
 import splitfolders
 
 
-
 @click.command()
 @click.argument("dataset-dir", type=click.Path(exists=True))
 @click.argument("output-dataset-dir", type=click.Path())

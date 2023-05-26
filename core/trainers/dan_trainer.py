@@ -1,8 +1,9 @@
 from typing import Tuple
 
 import torch
-from torch import Tensor, nn
 from loguru import logger
+from torch import Tensor, nn
+
 from core.trainers import Trainer
 
 
@@ -34,10 +35,8 @@ class DANTrainer(Trainer):
         self.criterion_pt = criterion_pt
 
     def _learn_on_batch(self, inputs, labels, phase):
-        with torch.set_grad_enabled(phase=="train"):
+        with torch.set_grad_enabled(phase == "train"):
             outputs, feat, heads = self.model(inputs)
-            logger.info(feat)
-            logger.info(labels)
             _, preds = torch.max(outputs, 1)
             loss: Tensor = (
                 self.criterion(outputs, labels)
