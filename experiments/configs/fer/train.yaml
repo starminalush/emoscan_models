@@ -35,9 +35,11 @@ criterion_pt:
   class_str: submodules.DAN.src.affectnet.PartitionLoss
 
 optimizer:
-  class_str: torch.optim.Adam
+  class_str: torch.optim.SGD
   params:
     lr: 0.001
+    weight_decay: 1e-4
+    momentum: 0.9
 
 scheduler:
   class_str: torch.optim.lr_scheduler.ExponentialLR
