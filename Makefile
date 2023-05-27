@@ -20,7 +20,7 @@ dvc_configure:
 
 ## Get all submodules
 get_submodules:
-	git submodule update --init --force --remote
+	git submodule update --init
 
 #################################################################################
 # Self Documenting Commands                                                     #
