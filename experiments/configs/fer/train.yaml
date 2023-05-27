@@ -37,7 +37,7 @@ criterion_pt:
 optimizer:
   class_str: torch.optim.Adam
   params:
-    lr: 0.001
+    lr: 0.0001
 
 scheduler:
   class_str: torch.optim.lr_scheduler.ExponentialLR
@@ -48,4 +48,4 @@ trainer:
   class_str: core.trainers.DANTrainer
 
 batch_size: 128
-num_epochs: 10
+num_epochs: 25
