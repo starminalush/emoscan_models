@@ -37,7 +37,7 @@ criterion_pt:
 optimizer:
   class_str: torch.optim.Adam
   params:
-    lr: 0.01
+    lr: 0.001
 
 scheduler:
   class_str: torch.optim.lr_scheduler.ExponentialLR
