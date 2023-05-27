@@ -1,4 +1,5 @@
-.PHONY: dvc_configure
+all: dvc_configure get_submodules
+.PHONY: all
 
 #################################################################################
 # GLOBALS                                                                       #
@@ -16,6 +17,10 @@ dvc_configure:
 	aws configure set aws_secret_access_key $(AWS_SECRET_ACCESS_KEY)
 	dvc remote add -f -d s3remote s3://${MINIO_BUCKET}
 	dvc remote modify s3remote endpointurl $(AWS_ENDPOINT_URL)
+
+## Get all submodules
+get_submodules:
+	git submodule update --init --force --remote
 
 #################################################################################
 # Self Documenting Commands                                                     #
