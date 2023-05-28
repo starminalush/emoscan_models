@@ -3,55 +3,29 @@ mfdp-2023
 
 Emotional recognition for online schools
 
-Project Organization
+Используемые датасеты
+---------------------
+<p><a target="_blank" href="https://www.kaggle.com/datasets/noamsegal/affectnet-training-data">AffectNet</a></p>
+<p><a target="_blank" href="https://www.kaggle.com/datasets/msambare/fer2013">Fer2013</a></p>
+
+DVC pipeline
 ------------
+![image](https://github.com/starminalush/mfdp-2023/assets/103132748/81fd0261-e8d3-4359-8c60-d0eb456b1d8a)
 
-    ├── LICENSE
-    ├── Makefile           <- Makefile with commands like `make data` or `make train`
-    ├── README.md          <- The top-level README for developers using this project.
-    ├── data
-    │   ├── external       <- Data from third party sources.
-    │   ├── interim        <- Intermediate data that has been transformed.
-    │   ├── processed      <- The final, canonical data sets for modeling.
-    │   └── raw            <- The original, immutable data dump.
-    │
-    ├── docs               <- A default Sphinx project; see sphinx-doc.org for details
-    │
-    ├── models             <- Trained and serialized models, model predictions, or model summaries
-    │
-    ├── notebooks          <- Jupyter notebooks. Naming convention is a number (for ordering),
-    │                         the creator's initials, and a short `-` delimited description, e.g.
-    │                         `1.0-jqp-initial-data-exploration`.
-    │
-    ├── references         <- Data dictionaries, manuals, and all other explanatory materials.
-    │
-    ├── reports            <- Generated analysis as HTML, PDF, LaTeX, etc.
-    │   └── figures        <- Generated graphics and figures to be used in reporting
-    │
-    ├── requirements.txt   <- The requirements file for reproducing the analysis environment, e.g.
-    │                         generated with `pip freeze > requirements.txt`
-    │
-    ├── setup.py           <- makes project pip installable (pip install -e .) so src can be imported
-    ├── src                <- Source code for use in this project.
-    │   ├── __init__.py    <- Makes src a Python module
-    │   │
-    │   ├── data           <- Scripts to download or generate data
-    │   │   └── make_dataset.py
-    │   │
-    │   ├── features       <- Scripts to turn raw data into features for modeling
-    │   │   └── build_features.py
-    │   │
-    │   ├── models         <- Scripts to train models and then use trained models to make
-    │   │   │                 predictions
-    │   │   ├── predict_model.py
-    │   │   └── train_model.py
-    │   │
-    │   └── visualization  <- Scripts to create exploratory and results oriented visualizations
-    │       └── visualize.py
-    │
-    └── tox.ini            <- tox file with settings for running tox; see tox.readthedocs.io
+Эксперименты
+---------------
+
+| Модель | Датасет | git tag | F1 мера | Latency (batch=1) | Throughtput (batch=5) | Вывод |
+| --- | --- | --- | --- | --- | --- | --- |
+| pretrained ResNet18 | FER2013 |  v1.0 | 0.67 | 0.012 | 918.7 | Получен бейзлайн |
+| pretrained ResNet18 | AffectNet-8 |  v1.1 | 0.70 | 0.011 | 916.6 | Улучшение качества и незначительное ухудшение пропускной способности|
+| pretrained ResNet18 | AffectNet-7 |  v1.2 | 0.712 | 0.013 | 913.9 | Улучшение качества и  незначительное ухудшение пропускной способности|
+| pretrained DAN(RafDB) | AffectNet-7 |  v1.3 | 0.718 | 0.018 | 524.9 | Улучшение качества и  незначительное ухудшение времени инференса. Сильное время ухудшения пропускной способности|
 
 
---------
+Запуск обучения
+---------
 
-<p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>
+1. Настроить конфиг .env
+2. Создать конфиг по примеру experiments/configs/fer/train.yaml. Указать импорты для нужных модулей
+3. Запустить контейнер train_models
