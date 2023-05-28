@@ -15,7 +15,7 @@ def make_learning_subsets(dataset_dir: Path | str, output_dataset_dir: Path | st
         dataset_dir, output=output_dataset_dir, seed=42, ratio=(0.8, 0.1, 0.1)
     )
     for subset in ["train", "val", "test"]:
-        (output_dataset_dir / subset / "angry").parent.mkdir(exist_ok=True)
+        (output_dataset_dir / subset / "angry").mkdir(exist_ok=True)
         (output_dataset_dir / subset / "anger").rename(
             output_dataset_dir / subset / "angry"
         )
