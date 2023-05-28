@@ -8,8 +8,12 @@ from dotenv import load_dotenv
 from torch import nn
 from torch.utils.data import DataLoader
 from torchsampler import ImbalancedDatasetSampler
-from utils import (download_pretrained_model_from_gdrive, init_module,
-                   load_config, mlflow_logger)
+from utils import (
+    download_pretrained_model_from_gdrive,
+    init_module,
+    load_config,
+    mlflow_logger,
+)
 
 from core.trainers import Trainer
 
