@@ -67,8 +67,11 @@ class Trainer:
                 self.optimizer.zero_grad()
                 inputs: Tensor = inputs.to(self.device)
                 labels: Tensor = labels.to(self.device)
-                loss, preds = self._learn_on_batch(inputs, labels, phase)
-
+                loss, outputs = self._learn_on_batch(inputs, labels, phase)
+                _, preds = torch.max(outputs, 1)
+                if phase == "train":
+                    loss.backward()
+                    self.optimizer.step()
                 current_loss += loss.item()
                 if phase == "val":
                     self.metrics.update(preds, labels)
@@ -111,7 +114,7 @@ class Trainer:
                 images, labels = data
                 images: torch.Tensor = images.to(self.device)
                 labels: torch.Tensor = labels.to(self.device)
-                outputs: torch.Tensor = self.model(images)
+                outputs: torch.Tensor = self._model_forward(images)
                 _, predicted = torch.max(outputs, 1)
                 self.metrics.update(labels, predicted)
                 self.per_class_metrics.update(labels, predicted)
@@ -125,12 +128,9 @@ class Trainer:
 
     def _learn_on_batch(self, inputs, labels, phase):
         with torch.set_grad_enabled(phase == "train"):
-            outputs: Tensor = self.model(inputs)
-            _, preds = torch.max(outputs, 1)
+            outputs: Tensor = self._model_forward(inputs)
             loss: Tensor = self.criterion(outputs, labels)
+        return loss, outputs
 
-            if phase == "train":
-                loss.backward()
-                self.optimizer.step()
-
-        return loss, preds
+    def _model_forward(self, inputs):
+        return self.model(inputs)
