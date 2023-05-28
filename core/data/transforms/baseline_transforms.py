@@ -1,7 +1,7 @@
 from torchvision import transforms
 
 
-class ImageTransform:
+class BaselineImageTransform:
     def __init__(self, img_size=224):
         self.data_transform = {
             "train": transforms.Compose(
@@ -22,5 +22,5 @@ class ImageTransform:
             ),
         }
 
-    def __call__(self, phase):
+    def __call__(self, phase) -> transforms.Compose:
         return self.data_transform[phase]

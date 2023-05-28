@@ -1,19 +1,12 @@
-import torch
 from torch import nn
-from torchvision import models
+from torchvision.models import resnet18
+
+from core.models.base_model import BaseModel
 
 
-class FERResnet18(nn.Module):
-    def __init__(self, num_class, pretrained="False"):
-        super().__init__()
-        self.__model = self.__init_model(num_classes=num_class, pretrained=pretrained)
-
+class FERResnet18(BaseModel):
     @staticmethod
-    def __init_model(num_classes, pretrained):
-        model = models.resnet18(pretrained)
-        model.fc = torch.nn.Linear(model.fc.in_features, num_classes, bias=True)
-
+    def _init_model(num_classes, pretrained) -> nn.Module:
+        model: nn.Module = resnet18(pretrained)
+        model.fc = nn.Linear(model.fc.in_features, num_classes, bias=True)
         return model
-
-    def forward(self, x):
-        return self.__model.forward(x)

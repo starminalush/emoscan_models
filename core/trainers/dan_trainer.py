@@ -1,15 +1,17 @@
 import torch
+from torch import Tensor
+from torch.nn import Module
 
 from core.trainers import Trainer
 
 
 class DANTrainer(Trainer):
-    def __init__(self, criterion_af, criterion_pt, **kwargs):
+    def __init__(self, criterion_af: Module, criterion_pt: Module, **kwargs):
         super(DANTrainer, self).__init__(**kwargs)
-        self.criterion_af = criterion_af
-        self.criterion_pt = criterion_pt
+        self.criterion_af: Module = criterion_af
+        self.criterion_pt: Module = criterion_pt
 
-    def _learn_on_batch(self, inputs, labels, phase):
+    def _learn_step(self, inputs: Tensor, labels: Tensor, phase: str):
         with torch.set_grad_enabled(phase == "train"):
             outputs, feat, heads = self._model_forward(inputs, phase=phase)
             loss: torch.Tensor = (
@@ -20,7 +22,7 @@ class DANTrainer(Trainer):
 
         return loss, outputs
 
-    def _model_forward(self, inputs, **kwargs):
+    def _model_forward(self, inputs: Tensor, **kwargs):
         outputs, feat, heads = self.model(inputs)
         if kwargs.get("phase") and kwargs.get("phase") in ["train", "val"]:
             return outputs, feat, heads

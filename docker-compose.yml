@@ -64,7 +64,6 @@ services:
     command: mlflow server --backend-store-uri postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB} --default-artifact-root s3://${MINIO_MLFLOW_BUCKET}/  --host 0.0.0.0
 
   train_models:
-    restart: no
     build: ./
     runtime: nvidia
     volumes:
@@ -74,7 +73,5 @@ services:
       - .env
     environment:
       - NVIDIA_VISIBLE_DEVICES=0
-#    depends_on:
-#      - mlflow
     command: dvc repro experiments/dvc.yaml
 

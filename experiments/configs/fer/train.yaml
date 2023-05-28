@@ -2,7 +2,7 @@ dataset:
   class_str: torchvision.datasets.ImageFolder
 
 transforms:
-  class_str: core.data.transforms.baseline_transforms.ImageTransform
+  class_str: core.data.transforms.BaselineImageTransform
   params:
     img_size: 224
 

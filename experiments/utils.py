@@ -1,5 +1,6 @@
 import functools
 import importlib
+from pathlib import Path
 from time import time
 
 import gdown
@@ -9,7 +10,12 @@ from loguru import logger
 import mlflow
 
 
-def download_pretrained_model_from_gdrive(file_id: str, output_model_name: str):
+def download_pretrained_model_from_gdrive(file_id: str, output_model_name: Path | str):
+    """Download model from gdrive based on fileid
+    Args:
+        file_id: file id in gdrive
+        output_model_name: output_file_name
+    """
     uri = f"https://drive.google.com/uc?id={file_id}"
     gdown.download(uri, output_model_name, quiet=False)
 
@@ -20,27 +26,18 @@ def load_config(config_path: str):
     return config
 
 
-def timeit(func):
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs):
-        start_time = time()
-        result = func(*args, **kwargs)
-        time_elapsed: float = time() - start_time
-        logger.info(
-            f"Training complete in {time_elapsed // 60:.0f}m {time_elapsed % 60:.0f}s"
-        )
-        return result
-
-    return wrapper
-
-
 def init_module(class_str: str):
+    """Initialize class by import name
+
+    Args:
+        class_str: import path of class
+    """
     module_path, class_name = class_str.rsplit(".", 1)
     module = importlib.import_module(module_path)
     return getattr(module, class_name)
 
 
-def mlflow_logger(experiment_name):
+def mlflow_logger(experiment_name: str):
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
@@ -64,7 +61,7 @@ def mlflow_logger(experiment_name):
                     mlflow.log_metric("Valid F1", val_metrics_history[i])
 
                 mlflow.log_metric("Test F1 metric", test_metric)
-                mlflow.log_metric("Throughtput images/second", throughtput)
+                mlflow.log_metric("Throughput images/second", throughtput)
                 mlflow.log_metric("Latency second", latency)
                 for cls, f1 in per_class_metrics.items():
                     mlflow.log_metric(f"Test F1_class_{cls}", f1)
