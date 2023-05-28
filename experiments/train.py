@@ -99,6 +99,7 @@ def train(config_path: str | Path, model_output_path: str | Path):
         inv_map[idx]: value for idx, value in enumerate(per_class_metrics)
     }
     throughtput = trainer.calculate_throughtput()
+    latency = trainer.calculate_latency()
     return (
         best_model,
         best_loss,
@@ -108,6 +109,7 @@ def train(config_path: str | Path, model_output_path: str | Path):
         test_metric,
         per_class_metrics,
         throughtput,
+        latency,
     )
 
 

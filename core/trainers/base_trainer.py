@@ -1,6 +1,7 @@
 import math
 from typing import List, Tuple
 
+import numpy as np
 import torch
 from loguru import logger
 from torch import Tensor, nn
@@ -79,7 +80,7 @@ class Trainer:
         return epoch_metrics, epoch_loss
 
     def calculate_throughtput(self):
-        dummy_input = torch.randn(1, 3, 224, 224, dtype=torch.float).to(self.device)
+        dummy_input = torch.randn(5, 3, 224, 224, dtype=torch.float).to(self.device)
         repetitions = 100
         total_time = 0
         with torch.no_grad():
@@ -93,8 +94,28 @@ class Trainer:
                 torch.cuda.synchronize()
                 curr_time = starter.elapsed_time(ender) / 1000
                 total_time += curr_time
-        throughput = repetitions / total_time
+        throughput = repetitions * 5 / total_time
         return throughput
+
+    def calculate_latency(self):
+        dummy_input = torch.randn(1, 3, 224, 224, dtype=torch.float).to(self.device)
+        starter, ender = torch.cuda.Event(enable_timing=True), torch.cuda.Event(
+            enable_timing=True
+        )
+        repetitions = 300
+        timings = np.zeros((repetitions, 1))
+        for _ in range(10):
+            _ = self.model(dummy_input)
+        # MEASURE PERFORMANCE
+        with torch.no_grad():
+            for rep in range(repetitions):
+                starter.record()
+                _ = self.model(dummy_input)
+                ender.record()
+                torch.cuda.synchronize()
+                curr_time = starter.elapsed_time(ender)
+                timings[rep] = curr_time
+        return np.sum(timings) / repetitions
 
     def test(self) -> Tuple[float, float]:
         with torch.no_grad():
