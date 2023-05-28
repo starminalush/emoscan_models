@@ -1,7 +1,7 @@
 import math
+import time
 from typing import List, Tuple
 
-import numpy as np
 import torch
 from loguru import logger
 from torch import Tensor, nn
@@ -102,23 +102,11 @@ class Trainer:
 
     def calculate_latency(self):
         dummy_input = torch.randn(1, 3, 224, 224, dtype=torch.float).to(self.device)
-        starter, ender = torch.cuda.Event(enable_timing=True), torch.cuda.Event(
-            enable_timing=True
-        )
-        repetitions = 300
-        timings = np.zeros((repetitions, 1))
-        for _ in range(10):
-            _ = self.model(dummy_input)
-        # MEASURE PERFORMANCE
-        with torch.no_grad():
-            for rep in range(repetitions):
-                starter.record()
-                _ = self.model(dummy_input)
-                ender.record()
-                torch.cuda.synchronize()
-                curr_time = starter.elapsed_time(ender)
-                timings[rep] = curr_time
-        return np.sum(timings) / repetitions
+        start = time.time()
+        self.model(dummy_input)
+        end = time.time()
+        latency = end - start
+        return latency
 
     def test(self) -> Tuple[float, float]:
         with torch.no_grad():
