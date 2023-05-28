@@ -96,10 +96,6 @@ def train(
     model.to(device)
 
     criterion_cls: Module = init_module(config["criterion_cls"]["class_str"])()
-    criterion_af: Module = init_module(config["criterion_af"]["class_str"])(
-        **config["criterion_af"]["params"], device=device
-    )
-    criterion_pt: Module = init_module(config["criterion_pt"]["class_str"])()
     metric: Metric = init_module(config["metrics"]["class_str"])(
         **config["metrics"]["params"]
     )
@@ -110,9 +106,8 @@ def train(
     )
     per_class_metric.to(device)
 
-    params: List = list(model.parameters()) + list(criterion_af.parameters())
     optimizer: Optimizer = init_module(config["optimizer"]["class_str"])(
-        params, **config["optimizer"]["params"]
+        model.parameters(), **config["optimizer"]["params"]
     )
     scheduler: LRScheduler = init_module(config["scheduler"]["class_str"])(
         optimizer, **config["scheduler"]["params"]
@@ -126,8 +121,6 @@ def train(
         model=model,
         metrics=metric,
         per_class_metrics=per_class_metric,
-        criterion_pt=criterion_pt,
-        criterion_af=criterion_af,
     )
 
     # train and valid
