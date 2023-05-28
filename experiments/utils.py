@@ -55,6 +55,7 @@ def mlflow_logger(experiment_name):
                     test_metric,
                     per_class_metrics,
                     throughtput,
+                    latency,
                 ) = func(*args, **kwargs)
                 mlflow.log_metric("Valid best F1", best_metrics)
                 mlflow.log_metric("Valid best loss", best_loss)
@@ -63,7 +64,8 @@ def mlflow_logger(experiment_name):
                     mlflow.log_metric("Valid F1", val_metrics_history[i])
 
                 mlflow.log_metric("Test F1 metric", test_metric)
-                mlflow.log_metric("Throughtput", throughtput)
+                mlflow.log_metric("Throughtput images/second", throughtput)
+                mlflow.log_metric("Latency second", latency)
                 for cls, f1 in per_class_metrics.items():
                     mlflow.log_metric(f"Test F1_class_{cls}", f1)
                 mlflow.log_artifact(kwargs["config_path"])
