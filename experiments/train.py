@@ -8,8 +8,12 @@ from dotenv import load_dotenv
 from torch import nn
 from torch.utils.data import DataLoader
 from torchsampler import ImbalancedDatasetSampler
-from utils import (download_pretrained_model_from_gdrive, init_module,
-                   load_config, mlflow_logger)
+from utils import (
+    download_pretrained_model_from_gdrive,
+    init_module,
+    load_config,
+    mlflow_logger,
+)
 
 from core.trainers import Trainer
 
@@ -109,6 +113,9 @@ def train(
         best_model,
         val_loss_history,
         val_metrics_history,
+        val_loss_history_cls,
+        val_loss_history_af,
+        val_loss_history_pt,
     ) = trainer.train(num_epochs=num_epochs)
     torch.save(best_model, model_output_path)
 
@@ -130,6 +137,9 @@ def train(
         per_class_metrics,
         throughtput,
         latency,
+        val_loss_history_cls,
+        val_loss_history_af,
+        val_loss_history_pt,
     )
 
 

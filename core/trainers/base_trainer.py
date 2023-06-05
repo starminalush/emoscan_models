@@ -29,9 +29,7 @@ class Trainer:
         self.dataloaders = dataloaders
         self.device = device
 
-    def train(
-        self, num_epochs
-    ) -> Tuple[float, float, nn.Module, List[float], List[float]]:
+    def train(self, num_epochs) -> Tuple:
         best_loss: float = math.inf
         best_metrics: float = 0.0
         best_model = None
