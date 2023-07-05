@@ -86,7 +86,7 @@ def train(
         if not checkpoint_path.exists():
             download_pretrained_model_from_gdrive(
                 file_id=config["model"]["checkpoint_gdrive_id"],
-                output_model_name=checkpoint_path,
+                output_model_name=str(checkpoint_path),
             )
         checkpoint = torch.load(
             f=checkpoint_path,

@@ -10,7 +10,7 @@ from loguru import logger
 import mlflow
 
 
-def download_pretrained_model_from_gdrive(file_id: str, output_model_name: Path | str):
+def download_pretrained_model_from_gdrive(file_id: str, output_model_name: str):
     """Download model from gdrive based on fileid
     Args:
         file_id: file id in gdrive
