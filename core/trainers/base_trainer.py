@@ -1,9 +1,8 @@
 import math
 import time
-from typing import Dict, List, Tuple
 
-import torch
 from loguru import logger
+import torch
 from torch import Tensor
 from torch.nn import Module
 from torch.optim import Optimizer
@@ -16,7 +15,7 @@ from tqdm import tqdm
 class Trainer:
     def __init__(
         self,
-        dataloaders: Dict[str, DataLoader],
+        dataloaders: dict[str, DataLoader],
         device: torch.device,
         optimizer: Optimizer,
         criterion: Module,
@@ -36,20 +35,21 @@ class Trainer:
 
     def train(
         self, num_epochs: int
-    ) -> Tuple[float, float, Module, List[float], List[float]]:
-        """Train model for number of epochs
+    ) -> tuple[float, float, Module, list[float], list[float]]:
+        """Train model for number of epochs.
+
         Args:
-            num_epochs: number of epochs
+            num_epochs: Number of epochs.
 
         Returns:
-            A tuple containing best model, loss and metric, and also train history
+            A tuple containing best model, loss and metric, and also train history.
 
         """
         best_loss: float = math.inf
         best_metrics: float = 0.0
         best_model = None
-        test_f1_history: List[float] = []
-        test_loss_history: List[float] = []
+        test_f1_history: list[float] = []
+        test_loss_history: list[float] = []
         for idx in range(num_epochs):
             metrics, loss = self._train_one_epoch()
             test_f1_history.append(metrics)
@@ -62,10 +62,80 @@ class Trainer:
                 best_model = self.model
         return best_loss, best_metrics, best_model, test_loss_history, test_f1_history
 
-    def _train_one_epoch(self) -> Tuple[float, float]:
-        """Starts training for one epoch.
+    def calculate_throughput(self) -> float:
+        """Calculate throughput of model.
+
         Returns:
-            A tuple containing loss and metric
+            Throughput of model (images/second).
+
+        """
+        dummy_input = torch.randn(5, 3, 224, 224, dtype=torch.float).to(self.device)
+        repetitions = 100
+        total_time = 0
+        with torch.no_grad():
+            for rep in range(repetitions):
+                starter, ender = torch.cuda.Event(enable_timing=True), torch.cuda.Event(
+                    enable_timing=True
+                )
+                starter.record()
+                self.model(dummy_input)
+                ender.record()
+                torch.cuda.synchronize()
+                curr_time = starter.elapsed_time(ender) / 1000
+                total_time += curr_time
+        throughput = repetitions * 5 / total_time
+        return throughput
+
+    def calculate_latency(self) -> float:
+        """Calculate latency of model.
+
+        Returns:
+            Latency of model (seconds).
+        """
+        dummy_input = torch.randn(1, 3, 224, 224, dtype=torch.float).to(self.device)
+        start = time.time()
+        self.model(dummy_input)
+        end = time.time()
+        latency = end - start
+        return latency
+
+    def test(self) -> tuple[float, float]:
+        """Starts testing the best model on test subset.
+
+        Returns:
+            A tuple containing loss and metric.
+        """
+        with torch.no_grad():
+            for data in self.dataloaders["test"]:
+                images, labels = data
+                images: torch.Tensor = images.to(self.device)
+                labels: torch.Tensor = labels.to(self.device)
+                outputs: torch.Tensor = self._model_forward(images)
+                _, predicted = torch.max(outputs, 1)
+                self.metrics.update(labels, predicted)
+                self.per_class_metrics.update(labels, predicted)
+
+        current_metric = self.metrics.compute()
+        per_class_metric = self.per_class_metrics.compute()
+        self.metrics.reset()
+        self.per_class_metrics.reset()
+
+        return current_metric, per_class_metric
+
+    def _learn_step(self, inputs, labels, phase) -> tuple[Tensor, Tensor]:
+        with torch.set_grad_enabled(phase == "train"):
+            outputs: Tensor = self._model_forward(inputs)
+            loss: Tensor = self.criterion(outputs, labels)
+        return loss, outputs
+
+    def _model_forward(self, inputs) -> Tensor:
+        return self.model(inputs)
+
+    def _train_one_epoch(self) -> tuple[float, float]:
+        """Starts training for one epoch.
+
+        Returns:
+            A tuple containing loss and metric.
         """
         for phase in ["train", "val"]:
             if phase == "train":
@@ -94,60 +164,3 @@ class Trainer:
         self.metrics.reset()
 
         return epoch_metrics, epoch_loss
-
-    def calculate_throughput(self) -> float:
-        dummy_input = torch.randn(5, 3, 224, 224, dtype=torch.float).to(self.device)
-        repetitions = 100
-        total_time = 0
-        with torch.no_grad():
-            for rep in range(repetitions):
-                starter, ender = torch.cuda.Event(enable_timing=True), torch.cuda.Event(
-                    enable_timing=True
-                )
-                starter.record()
-                self.model(dummy_input)
-                ender.record()
-                torch.cuda.synchronize()
-                curr_time = starter.elapsed_time(ender) / 1000
-                total_time += curr_time
-        throughput = repetitions * 5 / total_time
-        return throughput
-
-    def calculate_latency(self) -> float:
-        dummy_input = torch.randn(1, 3, 224, 224, dtype=torch.float).to(self.device)
-        start = time.time()
-        self.model(dummy_input)
-        end = time.time()
-        latency = end - start
-        return latency
-
-    def test(self) -> Tuple[float, float]:
-        """Starts testing the best model on test subset
-        Returns:
-            A tuple containing loss and metric
-        """
-        with torch.no_grad():
-            for data in self.dataloaders["test"]:
-                images, labels = data
-                images: torch.Tensor = images.to(self.device)
-                labels: torch.Tensor = labels.to(self.device)
-                outputs: torch.Tensor = self._model_forward(images)
-                _, predicted = torch.max(outputs, 1)
-                self.metrics.update(labels, predicted)
-                self.per_class_metrics.update(labels, predicted)
-
-        current_metric = self.metrics.compute()
-        per_class_metric = self.per_class_metrics.compute()
-        self.metrics.reset()
-        self.per_class_metrics.reset()
-
-        return current_metric, per_class_metric
-
-    def _learn_step(self, inputs, labels, phase) -> Tuple[Tensor, Tensor]:
-        with torch.set_grad_enabled(phase == "train"):
-            outputs: Tensor = self._model_forward(inputs)
-            loss: Tensor = self.criterion(outputs, labels)
-        return loss, outputs
-
-    def _model_forward(self, inputs) -> Tensor:
-        return self.model(inputs)

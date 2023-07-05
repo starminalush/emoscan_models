@@ -1,3 +1,5 @@
+"""Simple transforms for training."""
+
 from torchvision import transforms
 
 

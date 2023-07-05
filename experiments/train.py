@@ -12,8 +12,7 @@ from torchmetrics import Metric
 from torchsampler import ImbalancedDatasetSampler
 from torchvision.datasets import VisionDataset
 from torchvision.transforms import Compose
-from utils import (download_pretrained_model_from_gdrive, init_module,
-                   load_config, mlflow_logger)
+from utils import download_pretrained_model_from_gdrive, init_module, load_config, mlflow_logger
 
 from core.trainers import Trainer
 

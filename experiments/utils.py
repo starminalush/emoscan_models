@@ -1,43 +1,58 @@
 import functools
 import importlib
-from pathlib import Path
-from time import time
+from typing import Any
 
 import gdown
-import yaml
-from loguru import logger
-
 import mlflow
+import yaml
 
 
 def download_pretrained_model_from_gdrive(file_id: str, output_model_name: str):
-    """Download model from gdrive based on fileid
+    """Download model from gdrive based on fileid.
+
     Args:
-        file_id: file id in gdrive
-        output_model_name: output_file_name
+        file_id: File ID in gdrive.
+        output_model_name: Output file name.
     """
     uri = f"https://drive.google.com/uc?id={file_id}"
     gdown.download(uri, output_model_name, quiet=False)
 
 
-def load_config(config_path: str):
+def load_config(config_path: str) -> dict[str, Any]:
+    """Load config (for example, for train stage) from yaml file.
+
+    Args:
+        config_path: Input config path.
+
+    Returns:
+        Dict containing config params and values for each params.
+    """
     with open(config_path) as src:
-        config: dict = yaml.load(src, Loader=yaml.Loader)
+        config: dict = yaml.safe_load(src, Loader=yaml.Loader)
     return config
 
 
-def init_module(class_str: str):
-    """Initialize class by import name
+def init_module(class_str: str) -> object:
+    """Initialize class by import name.
 
     Args:
-        class_str: import path of class
+        class_str: Import path of class.
+
+    Returns:
+        The received attribute, which is supposed to be an object of the class.
     """
     module_path, class_name = class_str.rsplit(".", 1)
     module = importlib.import_module(module_path)
     return getattr(module, class_name)
 
 
-def mlflow_logger(experiment_name: str):
+def mlflow_logger(experiment_name: str):  # noqa:  WPS324, DAR201
+    """Decorate train function for easy logging training result to mlflow server.
+
+    Args:
+        experiment_name: Custom experiment name of task.
+    """
+
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
@@ -56,15 +71,15 @@ def mlflow_logger(experiment_name: str):
                 ) = func(*args, **kwargs)
                 mlflow.log_metric("Valid best F1", best_metrics)
                 mlflow.log_metric("Valid best loss", best_loss)
-                for i in range(len(val_loss_history)):
-                    mlflow.log_metric("Valid loss", val_loss_history[i])
-                    mlflow.log_metric("Valid F1", val_metrics_history[i])
+                for idx in range(len(val_loss_history)):
+                    mlflow.log_metric("Valid loss", val_loss_history[idx])
+                    mlflow.log_metric("Valid F1", val_metrics_history[idx])
 
                 mlflow.log_metric("Test F1 metric", test_metric)
                 mlflow.log_metric("Throughput images/second", throughtput)
                 mlflow.log_metric("Latency second", latency)
-                for cls, f1 in per_class_metrics.items():
-                    mlflow.log_metric(f"Test F1_class_{cls}", f1)
+                for class_label, f1 in per_class_metrics.items():
+                    mlflow.log_metric(f"Test F1_class_{class_label}", f1)
                 mlflow.log_artifact(kwargs["config_path"])
                 mlflow.pytorch.log_model(model, "model.pt")
                 return None

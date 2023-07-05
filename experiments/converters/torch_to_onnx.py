@@ -1,9 +1,9 @@
 from pathlib import Path
 
 import click
+import mlflow
 import onnx
 import torch
-import mlflow
 from dotenv import load_dotenv
 
 load_dotenv()
