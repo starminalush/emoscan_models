@@ -6,8 +6,8 @@ import splitfolders
 
 
 @click.command()
-@click.argument("--dataset-dir", type=click.Path(exists=True, path_type=Path))
-@click.argument("--output-dataset-dir", type=click.Path(path_type=Path))
+@click.option("--dataset-dir", type=click.Path(exists=True, path_type=Path))
+@click.option("--output-dataset-dir", type=click.Path(path_type=Path))
 def make_learning_subsets(
     dataset_dir: Path | str, output_dataset_dir: Path | str
 ) -> None:

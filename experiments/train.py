@@ -18,9 +18,9 @@ from core.trainers import Trainer
 
 
 @click.command()
-@click.argument("config-path", type=click.Path(exists=True, path_type=Path))
-@click.argument("model-output-path", type=click.Path(path_type=Path))
-@click.argument("checkpoint-path", type=click.Path(path_type=Path), required=False)
+@click.option("--config-path", type=click.Path(exists=True, path_type=Path))
+@click.option("--model-output-path", type=click.Path(path_type=Path))
+@click.option("--checkpoint-path", type=click.Path(path_type=Path), required=False)
 @mlflow_logger("fer")
 def train(
     config_path: Path | str,

@@ -1,7 +1,7 @@
 stages:
   download_dataset_from_kaggle:
     wdir: ../
-    cmd: python3 experiments/data/download_dataset.py data/external/affectnet noamsegal/affectnet-training-data
+    cmd: python3 experiments/data/download_dataset.py --external-dataset-dir data/external/affectnet --dataset-name noamsegal/affectnet-training-data
     deps:
       - experiments/data/download_dataset.py
     outs:
@@ -9,7 +9,7 @@ stages:
 
   train_val_split:
     wdir: ../
-    cmd: python3 experiments/data/make_learning_subsets.py data/external/affectnet data/processed/affectnet
+    cmd: python3 experiments/data/make_learning_subsets.py --dataset-dir data/external/affectnet --output-dataset-dir data/processed/affectnet
     deps:
       - experiments/data/make_learning_subsets.py
       - data/external/affectnet
@@ -19,10 +19,11 @@ stages:
 
   train_model:
     wdir: ../
-    cmd: python3 experiments/train.py experiments/configs/fer/train.yaml models/resnet_baseline.pt models/checkpoint.pth
+    cmd: python3 experiments/train.py --config-path experiments/configs/fer/train.yaml --model-output-path models/resnet_baseline.pt --checkpoint-path models/checkpoint.pth
     deps:
       - experiments/train.py
       - experiments/configs/fer/train.yaml
+      - data/processed/affectnet
     outs:
       - models/resnet_baseline.pt
 

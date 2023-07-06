@@ -12,6 +12,8 @@ RUN sudo apt-get update \
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 WORKDIR /train_models
+CMD ["make", "get_submodules"]
+CMD ["dvc",  "repro", "experiments/dvc.yaml"]
 
 
 
