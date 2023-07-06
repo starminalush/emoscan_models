@@ -34,7 +34,7 @@ def load_config(config_path: str) -> dict[str, Any]:
         Dict containing config params and values for each params.
     """
     with open(config_path) as src:
-        config: dict = yaml.load(src, Loader=yaml.Loader)
+        config: dict = yaml.safe_load(src)
     return config
 
 

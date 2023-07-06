@@ -21,7 +21,7 @@ def make_learning_subsets(
     splitfolders.ratio(
         dataset_dir, output=output_dataset_dir, seed=42, ratio=(0.8, 0.1, 0.1),  # noqa: WPS432
     )
-    for subset in ["train", "val", "test"]:
+    for subset in {"train", "val", "test"}:
         (output_dataset_dir / subset / "angry").mkdir(exist_ok=True)
         (output_dataset_dir / subset / "anger").rename(
             output_dataset_dir / subset / "angry"

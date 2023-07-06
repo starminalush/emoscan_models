@@ -11,10 +11,11 @@ api.authenticate()
 @click.argument("external-dataset-path", type=click.Path(path_type=Path))
 @click.argument("dataset-name", type=str)
 def download_dataset(external_dataset_path: Path | str, dataset_name: str) -> None:
-    """Download external dataset from kaggle by dataset name
+    """Download external dataset from kaggle by dataset name.
+
     Args:
-        dataset_name: kaggle dataset name
-        external_dataset_path: downloaded dataset path
+        dataset_name: Kaggle dataset name.
+        external_dataset_path: Downloaded dataset path.
     """
     api.dataset_download_files(dataset_name, path=external_dataset_path, unzip=True)
     logger.info("finish download dataset")

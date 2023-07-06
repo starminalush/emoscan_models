@@ -22,6 +22,6 @@ class DANTrainer(Trainer):
 
     def _model_forward(self, inputs: Tensor, **kwargs):
         outputs, feat, heads = self.model(inputs)
-        if kwargs.get("phase") and kwargs.get("phase") in ["train", "val"]:
+        if kwargs.get("phase") and kwargs.get("phase") in {"train", "val"}:
             return outputs, feat, heads
         return outputs
