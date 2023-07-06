@@ -37,14 +37,15 @@ def train(
     float,
     float,
 ]:
-    """Starts training the model based on the config
+    """Start training the model based on the config.
+
     Args:
-        config_path: model and params config
-        model_output_path: path of trained model
-        checkpoint_path: checkpoint path for initial model
+        config_path: Model and params config.
+        model_output_path: Path of trained model.
+        checkpoint_path: Checkpoint path for initial model.
 
     Returns:
-        A tuple containing best trained model, loss and metrics, train history, throughtput and latency of best model
+        A tuple containing best trained model, loss and metrics, train history, throughout and latency of best model.
 
     """
     config: Dict[str, str | float | int] = load_config(config_path=config_path)
@@ -109,9 +110,9 @@ def train(
     )
     per_class_metric.to(device)
 
-    params: List = list(model.parameters()) + list(criterion_af.parameters())
+    optimizer_params: List = list(model.parameters()) + list(criterion_af.parameters())
     optimizer: Optimizer = init_module(config["optimizer"]["class_str"])(
-        params, **config["optimizer"]["params"]
+        optimizer_params, **config["optimizer"]["params"]
     )
     scheduler: LRScheduler = init_module(config["scheduler"]["class_str"])(
         optimizer, **config["scheduler"]["params"]
@@ -141,9 +142,9 @@ def train(
 
     # test
     test_metric, per_class_metrics = trainer.test()
-    inv_map: Dict[int, float] = {v: k for k, v in train_data.class_to_idx.items()}
+    inv_map: Dict[int, float] = {cls_index: cls_label for cls_label, cls_index in train_data.class_to_idx.items()}
     per_class_metrics: Dict[str, float] = {
-        inv_map[idx]: value for idx, value in enumerate(per_class_metrics)
+        inv_map[idx]: metric_value for idx, metric_value in enumerate(per_class_metrics)
     }
     throughput: float = trainer.calculate_throughput()
     latency: float = trainer.calculate_latency()

@@ -1,8 +1,8 @@
 import math
 import time
 
-from loguru import logger
 import torch
+from loguru import logger
 from torch import Tensor
 from torch.nn import Module
 from torch.optim import Optimizer
@@ -73,7 +73,7 @@ class Trainer:
         repetitions = 100
         total_time = 0
         with torch.no_grad():
-            for rep in range(repetitions):
+            for _ in range(repetitions):
                 starter, ender = torch.cuda.Event(enable_timing=True), torch.cuda.Event(
                     enable_timing=True
                 )
@@ -83,8 +83,7 @@ class Trainer:
                 torch.cuda.synchronize()
                 curr_time = starter.elapsed_time(ender) / 1000
                 total_time += curr_time
-        throughput = repetitions * 5 / total_time
-        return throughput
+        return repetitions * 5 / total_time
 
     def calculate_latency(self) -> float:
         """Calculate latency of model.
@@ -96,8 +95,7 @@ class Trainer:
         start = time.time()
         self.model(dummy_input)
         end = time.time()
-        latency = end - start
-        return latency
+        return end - start
 
     def test(self) -> tuple[float, float]:
         """Starts testing the best model on test subset.
@@ -106,8 +104,7 @@ class Trainer:
             A tuple containing loss and metric.
         """
         with torch.no_grad():
-            for data in self.dataloaders["test"]:
-                images, labels = data
+            for (images, labels) in self.dataloaders["test"]:
                 images: torch.Tensor = images.to(self.device)
                 labels: torch.Tensor = labels.to(self.device)
                 outputs: torch.Tensor = self._model_forward(images)
@@ -132,7 +129,7 @@ class Trainer:
         return self.model(inputs)
 
     def _train_one_epoch(self) -> tuple[float, float]:
-        """Starts training for one epoch.
+        """Start training for one epoch.
 
         Returns:
             A tuple containing loss and metric.
@@ -146,7 +143,7 @@ class Trainer:
 
             current_loss: float = 0.0
 
-            for idx, (inputs, labels) in tqdm(enumerate(self.dataloaders[phase])):
+            for (inputs, labels) in tqdm(self.dataloaders[phase]):
                 self.optimizer.zero_grad()
                 inputs: Tensor = inputs.to(self.device)
                 labels: Tensor = labels.to(self.device)
@@ -159,7 +156,8 @@ class Trainer:
                 if phase == "val":
                     self.metrics.update(preds, labels)
 
-        epoch_loss: float = current_loss / (idx + 1)
+        # we calculate loss only after validation
+        epoch_loss: float = current_loss / (len(self.dataloaders["val"]))
         epoch_metrics: float = self.metrics.compute()
         self.metrics.reset()
 

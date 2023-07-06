@@ -47,5 +47,5 @@ scheduler:
 trainer:
   class_str: core.trainers.DANTrainer
 
-batch_size: 128
-num_epochs: 25
+batch_size: 64
+num_epochs: 1

@@ -1,14 +1,20 @@
 import functools
 import importlib
-from typing import Any
+from typing import Any, Callable, Concatenate, ParamSpec, TypeAlias, TypeVar
 
 import gdown
 import mlflow
 import yaml
 
 
+Param = ParamSpec("Param")
+RetType = TypeVar("RetType")
+OriginalFunc: TypeAlias = Callable[Param, RetType]
+DecoratedFunc: TypeAlias = Callable[Concatenate[tuple, Param], RetType]
+
+
 def download_pretrained_model_from_gdrive(file_id: str, output_model_name: str):
-    """Download model from gdrive based on fileid.
+    """Download model from gdrive based on file ID.
 
     Args:
         file_id: File ID in gdrive.
@@ -28,11 +34,11 @@ def load_config(config_path: str) -> dict[str, Any]:
         Dict containing config params and values for each params.
     """
     with open(config_path) as src:
-        config: dict = yaml.safe_load(src, Loader=yaml.Loader)
+        config: dict = yaml.load(src, Loader=yaml.Loader)
     return config
 
 
-def init_module(class_str: str) -> object:
+def init_module(class_str: str) -> Callable:
     """Initialize class by import name.
 
     Args:
@@ -46,16 +52,19 @@ def init_module(class_str: str) -> object:
     return getattr(module, class_name)
 
 
-def mlflow_logger(experiment_name: str):  # noqa:  WPS324, DAR201
+def mlflow_logger(experiment_name: str) -> Callable[[OriginalFunc], DecoratedFunc]:
     """Decorate train function for easy logging training result to mlflow server.
 
     Args:
         experiment_name: Custom experiment name of task.
+
+    Returns:
+        Result of decorated function.
     """
 
-    def decorator(func):
+    def decorator(func: OriginalFunc) -> DecoratedFunc:
         @functools.wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args, **kwargs) -> RetType:
             experiment_id: str = mlflow.set_experiment(experiment_name).experiment_id
             with mlflow.start_run(experiment_id=experiment_id):
                 (
@@ -71,9 +80,9 @@ def mlflow_logger(experiment_name: str):  # noqa:  WPS324, DAR201
                 ) = func(*args, **kwargs)
                 mlflow.log_metric("Valid best F1", best_metrics)
                 mlflow.log_metric("Valid best loss", best_loss)
-                for idx in range(len(val_loss_history)):
-                    mlflow.log_metric("Valid loss", val_loss_history[idx])
-                    mlflow.log_metric("Valid F1", val_metrics_history[idx])
+                for (val_loss, val_f1) in zip(val_loss_history, val_metrics_history):
+                    mlflow.log_metric("Valid loss", val_loss)
+                    mlflow.log_metric("Valid F1", val_f1)
 
                 mlflow.log_metric("Test F1 metric", test_metric)
                 mlflow.log_metric("Throughput images/second", throughtput)

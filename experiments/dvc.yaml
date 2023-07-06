@@ -25,3 +25,4 @@ stages:
       - experiments/configs/fer/train.yaml
     outs:
       - models/resnet_baseline.pt
+
