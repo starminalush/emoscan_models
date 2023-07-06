@@ -26,4 +26,3 @@ stages:
       - data/processed/affectnet
     outs:
       - models/resnet_baseline.pt
-
