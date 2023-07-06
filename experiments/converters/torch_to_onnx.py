@@ -1,10 +1,10 @@
 from pathlib import Path
 
 import click
+from dotenv import load_dotenv
 import mlflow
 import onnx
 import torch
-from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -13,7 +13,7 @@ load_dotenv()
 @click.option("--run-id", type=str)
 @click.option("--artifact-model-uri", type=str)
 @click.option(
-    "--onnx_model-path",
+    "--onnx-model-path",
     type=click.Path(path_type=Path),
     required=False,
     default="onnx_model.onnx",
